@@ -24,7 +24,7 @@ const BasicNotificationDrawer = (props) => {
 
     const [open, setOpen] = useState(false);
     const [active, setActive] = useState('');
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState([{description: 'test description', timestamp: '10 minutes ago'}]);
 
     const onToggle = isOpen => setOpen(isOpen);
     const onFocus = id => {
@@ -89,6 +89,7 @@ const BasicNotificationDrawer = (props) => {
             }
             position="bottom"
             minWidth="1000px"
+            minWidth="500px"
         >
             <Button variant="plain">
                 <MessagesIcon/>
