@@ -3,7 +3,8 @@ import React, { useState, Fragment } from 'react';
 import { Dropdown, DropdownItem, DropdownPosition, DropdownDirection,
     DropdownSeparator, KebabToggle, NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, NotificationDrawerList,
     NotificationDrawerListItem, NotificationDrawerListItemBody, NotificationDrawerListItemHeader,
-    Popover, PopoverPosition, Button, Badge } from '@patternfly/react-core';
+    Popover, PopoverPosition, Button, Badge,
+    Drawer, DrawerPanelContent, DrawerContent, DrawerContentBody, DrawerPanelBody, DrawerHead, DrawerActions, DrawerCloseButton } from '@patternfly/react-core';
 import { MessagesIcon } from '@patternfly/react-icons';
 import './NotificationDrawer.scss';
 import PropTypes from 'prop-types';
@@ -22,9 +23,10 @@ const dropdownItems = [
 
 const BasicNotificationDrawer = (props) => {
 
+    const [showDrawer, setShowDrawer] = useState(false);
     const [open, setOpen] = useState(false);
     const [active, setActive] = useState('');
-    const [notifications, setNotifications] = useState([{description: 'test description', timestamp: '10 minutes ago'}]);
+    const [notifications, setNotifications] = useState([{description: 'awesome stuff happened', timestamp: '10 minutes ago', title: "Something happened!"}]);
 
     const onToggle = isOpen => setOpen(isOpen);
     const onFocus = id => {
@@ -44,13 +46,13 @@ const BasicNotificationDrawer = (props) => {
         onFocus(event.target.id);
     }
 
-   
-    return (
-        <Popover
-            headerContent={<div>Notifications</div>}
-            bodyContent={
-                <NotificationDrawer>
-                    <NotificationDrawerHeader count={2}>
+    const panelContent = (
+        <DrawerPanelContent>
+            <DrawerHead>
+                <NotificationDrawer
+                    className="ins-c-notification-drawer"
+                >
+                    <NotificationDrawerHeader count={notifications.length}>
                         <Dropdown
                             onClick={onClick}
                             onSelect={onSelect}
@@ -62,41 +64,48 @@ const BasicNotificationDrawer = (props) => {
                             position={DropdownPosition.right}
                         />
                     </NotificationDrawerHeader>
-                    <NotificationDrawerBody>
+                    <NotificationDrawerBody
+                        className="ins-c-notification-drawer__body"
+                    >
                         <NotificationDrawerList>
-                            { notifications.map(notification => (
+                            {notifications.map(notification => (
                                 <NotificationDrawerListItem variant="info">
-                                <NotificationDrawerListItemHeader variant="info" title={notification.title || 'Title'} srTitle="Info notification:">
-                                    <Dropdown
-                                        position={DropdownPosition.right}
-                                        onClick={onClick}
-                                        onSelect={onSelect}
-                                        toggle={<KebabToggle onToggle={onToggle} id="toggle-id-1" />}
-                                        isOpen={open && active === 'toggle-id-1'}
-                                        isPlain
-                                        dropdownItems={dropdownItems}
-                                        id="notification-1"
-                                    />
-                                </NotificationDrawerListItemHeader>
-                                <NotificationDrawerListItemBody timestamp={notification.timestamp}>
-                                    {notification.description || 'Description'}
-                            </NotificationDrawerListItemBody>
-                            </NotificationDrawerListItem>
+                                    <NotificationDrawerListItemHeader variant="info" title={notification.title || 'Title'} srTitle="Info notification:">
+                                        <Dropdown
+                                            position={DropdownPosition.right}
+                                            onClick={onClick}
+                                            onSelect={onSelect}
+                                            toggle={<KebabToggle onToggle={onToggle} id="toggle-id-1" />}
+                                            isOpen={open && active === 'toggle-id-1'}
+                                            isPlain
+                                            dropdownItems={dropdownItems}
+                                            id="notification-1"
+                                        />
+                                    </NotificationDrawerListItemHeader>
+                                    <NotificationDrawerListItemBody timestamp={notification.timestamp}>
+                                        {notification.description || 'Description'}
+                                    </NotificationDrawerListItemBody>
+                                </NotificationDrawerListItem>
                             ))}
                         </NotificationDrawerList>
                     </NotificationDrawerBody>
                 </NotificationDrawer>
-            }
-            position="bottom"
-            minWidth="1000px"
-            minWidth="500px"
-        >
-            <Button variant="plain">
-                <MessagesIcon/>
-            <Badge className="ins-c-notification-drawer__badge" key={1} isRead>{notifications.length}</Badge>
-            </Button>
-        </Popover>
+            </DrawerHead>
+        </DrawerPanelContent>);
 
+   
+    return (
+        <React.Fragment>
+            <Button variant="plain" onClick={() => setShowDrawer(!showDrawer)}>
+                <MessagesIcon />
+                <Badge className="ins-c-notification-drawer__badge" key={1} isRead>{notifications.length}</Badge>
+            </Button>
+            <Drawer isExpanded={showDrawer}>
+                <DrawerContent panelContent={panelContent}>
+                    <DrawerContentBody/>
+                </DrawerContent>
+            </Drawer>
+        </React.Fragment>
     );
 }
 
