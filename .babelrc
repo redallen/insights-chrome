@@ -13,7 +13,8 @@
     "transform-inline-environment-variables",
     ["@babel/plugin-syntax-dynamic-import", {}, "syntax-dynamic"],
     "@babel/plugin-syntax-object-rest-spread",
-    "@babel/plugin-transform-runtime"
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-optional-chaining"
   ],
   "env": {
     "test": {

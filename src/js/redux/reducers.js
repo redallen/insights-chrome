@@ -107,3 +107,94 @@ export function onPageObjectId(state, { payload }) {
         pageObjectId: payload
     };
 }
+
+export function onAddNotification(state, { payload: { notificationGroup, ...payload } }) {
+    const activeGroup = state?.notifications?.groups?.[notificationGroup.groupName] || notificationGroup;
+
+    const newNotifications = {
+        ...state?.notifications,
+        groups: {
+            ...state?.notifications?.groups,
+            [notificationGroup.groupName]: {
+                ...activeGroup,
+                items: [
+                    ...activeGroup.items || [],
+                    payload
+                ]
+            }
+        }
+    };
+
+    localStorage.setItem(`${state?.notifications?.prefix}-chrome-notifications`, JSON.stringify(newNotifications));
+
+    return {
+        ...state,
+        notifications: newNotifications
+    };
+}
+
+export function onMarkAsReadNotification(state, { payload: { groupName, notificationIndex } }) {
+    const activeGroup = state?.notifications?.groups?.[groupName];
+    activeGroup.items[notificationIndex].isRead = true;
+
+    const newNotifications = {
+        ...state?.notifications,
+        groups: {
+            ...state?.notifications?.groups,
+            [groupName]: activeGroup
+        }
+    };
+
+    localStorage.setItem(`${state?.notifications?.prefix}-chrome-notifications`, JSON.stringify(newNotifications));
+
+    return {
+        ...state,
+        notifications: newNotifications
+    };
+}
+
+export function onDeleteNotification(state, { payload: { groupName, notificationIndex } }) {
+    const activeGroup = state?.notifications?.groups?.[groupName];
+    activeGroup.items.splice(notificationIndex, 1);
+
+    const newNotifications = {
+        ...state?.notifications,
+        groups: {
+            ...state?.notifications?.groups,
+            [groupName]: activeGroup
+        }
+    };
+
+    localStorage.setItem(`${state?.notifications?.prefix}-chrome-notifications`, JSON.stringify(newNotifications));
+
+    return {
+        ...state,
+        notifications: newNotifications
+    };
+}
+
+export function onLoadStoredNotifications(state, { payload, meta }) {
+    return {
+        ...state,
+        notifications: {
+            ...state?.notifications,
+            ...payload,
+            prefix: meta?.prefix,
+            groups: {
+                ...state?.notifications?.groups,
+                ...payload?.groups,
+                ...Object.entries(state?.notifications?.groups || {}).reduce((acc, [key, values]) => ({
+                    ...acc,
+                    [key]: {
+                        ...values,
+                        ...payload?.groups?.[key],
+                        items: [
+                            ...values.items || [],
+                            ...payload?.groups?.[key]?.items || []
+                        ]
+                    }
+                }), {})
+            }
+        }
+    };
+}

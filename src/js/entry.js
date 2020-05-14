@@ -1,7 +1,8 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { appNavClick } from './redux/actions';
+import { appNavClick, loadStoredNotification } from './redux/actions';
 import { spinUpStore } from './redux-config';
 import * as actionTypes from './redux/action-types';
 import loadInventory from './inventory';
@@ -41,7 +42,7 @@ export function chromeInit(libjwt) {
     const { store, middlewareListener, actions } = spinUpStore();
 
     // public API actions
-    const { identifyApp, appNav, appNavClick, clearActive, appAction, appObjectId, chromeNavUpdate } = actions;
+    const { identifyApp, appNav, appNavClick, clearActive, appAction, appObjectId, chromeNavUpdate, addNotification } = actions;
 
     // Init JWT first.
     const jwtAndNavResolver = libjwt.initPromise
@@ -50,10 +51,18 @@ export function chromeInit(libjwt) {
         actions.userLogIn(user);
         const navigationYml = await sourceOfTruth(libjwt.jwt.getEncodedToken());
         const navigationData = await loadNav(navigationYml);
+        if (user) {
+            const { session_state: sessionState } = libjwt.jwt.decodeToken(libjwt.jwt.getEncodedToken());
+            store.dispatch(loadStoredNotification(sessionState));
+        }
+
         chromeNavUpdate(navigationData);
         loadChrome(user);
     })
-    .catch(() => allowUnauthed() && loadChrome(false));
+    .catch((e) => {
+        console.log(e);
+        allowUnauthed() && loadChrome(false);
+    });
 
     return {
         identifyApp: (data) => {
@@ -62,6 +71,7 @@ export function chromeInit(libjwt) {
         navigation: appNav,
         appAction,
         appObjectId,
+        addNotification,
         appNavClick: ({ secondaryNav, ...payload }) => {
             if (!secondaryNav) {
                 clearActive();
@@ -182,6 +192,31 @@ function loadChrome(user) {
             }
 
             store.dispatch(appNavClick(defaultActive));
+
+            /**
+             * TODO! REMOVE ME PLEASE!
+             */
+            const accountNumber = user?.identity?.account_number;
+            if (accountNumber) {
+                const eventSource = new EventSource(`https://khala-kafka-noification-platform-ci.5a9f.insights-dev.openshiftapps.com/api/notifier/v1/connect?account_number=${accountNumber}&room=inventory`);
+                eventSource.addEventListener('notification', ({ data }) => {
+                    let host;
+                    try {
+                        host = JSON.parse(data).host;
+                    } catch (e) {
+                        host = {};
+                    }
+
+                    insights.chrome.addNotification({
+                        header: 'Inventory item was updated',
+                        groupName: 'inventory',
+                        groupTitle: 'Inventory notifications',
+                        body: <div>
+                            System <a href={`./insights/inventory/${host?.id}`}>{host?.display_name}</a> was updated!
+                        </div>
+                    });
+                });
+            }
 
             render(
                 <Provider store={store}>

@@ -39,7 +39,7 @@ authChannel.onmessage = (e) => {
     }
 };
 
-function decodeToken (str) {
+export function decodeToken (str) {
     str = str.split('.')[1];
     str = str.replace('/-/g', '+');
     str = str.replace('/_/g', '/');

@@ -76,3 +76,45 @@ export function appAction(action) {
 export function appObjectId(objectId) {
     return { type: actionTypes.CHROME_PAGE_OBJECT, payload: objectId };
 }
+
+export function addNotification({
+    timeStamp,
+    notificationGroup,
+    groupName,
+    groupTitle,
+    ...payload
+} = {}) {
+    return {
+        type: actionTypes.ADD_NEW_NOTIFICATION,
+        payload: {
+            timeStamp: timeStamp || new Date(),
+            notificationGroup: notificationGroup || {
+                groupName: groupName || 'global',
+                title: groupTitle || groupName ? `${groupName} notifications` : 'Global notifications'
+            },
+            ...payload
+        }
+    };
+}
+
+export function markAsread(groupName, notificationIndex) {
+    return {
+        type: actionTypes.MARK_AS_READ_NOTIFICATION,
+        payload: { groupName, notificationIndex }
+    };
+}
+
+export function loadStoredNotification(prefix) {
+    return {
+        type: actionTypes.POPULATE_NOTIFICATIONS,
+        payload: JSON.parse(localStorage.getItem(`${prefix}-chrome-notifications`)) || {},
+        meta: { prefix }
+    };
+}
+
+export function deleteNotification(groupName, notificationIndex) {
+    return {
+        type: actionTypes.REMOVE_NOTIFICATION,
+        payload: { groupName, notificationIndex }
+    };
+}

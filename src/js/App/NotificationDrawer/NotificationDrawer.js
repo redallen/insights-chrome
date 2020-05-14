@@ -1,93 +1,95 @@
 /* eslint-disable  */
 import React, { useState, Fragment } from 'react';
-import { Dropdown, DropdownItem, DropdownPosition, DropdownDirection,
-    DropdownSeparator, KebabToggle, NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, NotificationDrawerList,
+import { NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, NotificationDrawerList,
     NotificationDrawerListItem, NotificationDrawerListItemBody, NotificationDrawerListItemHeader,
-    Popover, PopoverPosition, Button, Badge,
-    Drawer, DrawerPanelContent, DrawerContent, DrawerContentBody, DrawerPanelBody, DrawerHead, DrawerActions, DrawerCloseButton } from '@patternfly/react-core';
-import { MessagesIcon } from '@patternfly/react-icons';
+    Button, Badge, NotificationDrawerGroupList, NotificationDrawerGroup,
+    Drawer, DrawerPanelContent, DrawerContent, DrawerContentBody, DrawerHead } from '@patternfly/react-core';
+import { MessagesIcon, TimesIcon } from '@patternfly/react-icons';
+import { useSelector, useDispatch } from 'react-redux'
+import { markAsread, deleteNotification } from '../../redux/actions';
 import './NotificationDrawer.scss';
-import PropTypes from 'prop-types';
 
-const dropdownItems = [
-    <DropdownItem key="link">Link</DropdownItem>,
-    <DropdownItem key="action" component="button">
-        Action
-      </DropdownItem>,
-    <DropdownSeparator key="separator" />,
-    <DropdownItem key="disabled link" isDisabled>
-        Disabled Link
-      </DropdownItem>
-];
+const calculateReadUnreadCount = (notificationsGroup) => notificationsGroup.reduce((acc, curr) => {
+    const unreadNotifications = curr?.items?.filter(({ isRead }) => !isRead) || [];
+    return {
+        unreadCount: acc.unreadCount + unreadNotifications.length,
+        readCount: acc.readCount + (curr.items.length - unreadNotifications.length)
+    }
+}, { unreadCount: 0, readCount: 0 })
 
-
-const BasicNotificationDrawer = (props) => {
-
+const BasicNotificationDrawer = () => {
+    const dispatch = useDispatch();
+    const [openedGroups, setOpenedGroups] = useState([]);
     const [showDrawer, setShowDrawer] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [active, setActive] = useState('');
-    const [notifications, setNotifications] = useState([{description: 'awesome stuff happened', timestamp: '10 minutes ago', title: "Something happened!"}]);
 
-    const onToggle = isOpen => setOpen(isOpen);
-    const onFocus = id => {
-        if (id) {
-            const element = document.getElementById(id);
-            element.focus();
-        }
+    const notificationGroups = useSelector(({ chrome: { notifications } }) => notifications?.groups || {});
+    
+    const onGroupToggle = (isOpen, groupName) => {
+        setOpenedGroups(
+            isOpen ?
+                [...openedGroups, groupName] :
+                openedGroups.filter(item => item !== groupName)
+        );
     }
-    const onSelect = event => {
-        setOpen(!open);
-        setActive('');
-        onFocus(event.target.id);
 
-    }
-    const onClick = event => {
-        setActive(event.target.id);
-        onFocus(event.target.id);
-    }
+    const { unreadCount } = calculateReadUnreadCount(Object.values(notificationGroups));
 
     const panelContent = (
         <DrawerPanelContent>
             <DrawerHead>
-                <NotificationDrawer
-                    className="ins-c-notification-drawer"
-                >
-                    <NotificationDrawerHeader count={notifications.length}>
-                        <Dropdown
-                            onClick={onClick}
-                            onSelect={onSelect}
-                            toggle={<KebabToggle onToggle={onToggle} id="toggle-id-basic" />}
-                            isOpen={open && active === 'toggle-id-basic'}
-                            isPlain
-                            dropdownItems={dropdownItems}
-                            id="notification-0"
-                            position={DropdownPosition.right}
-                        />
+                <NotificationDrawer className="ins-c-notification-drawer">
+                    <NotificationDrawerHeader count={ unreadCount !== 0 ? unreadCount : 'None' }>
                     </NotificationDrawerHeader>
-                    <NotificationDrawerBody
-                        className="ins-c-notification-drawer__body"
-                    >
-                        <NotificationDrawerList>
-                            {notifications.map(notification => (
-                                <NotificationDrawerListItem variant="info">
-                                    <NotificationDrawerListItemHeader variant="info" title={notification.title || 'Title'} srTitle="Info notification:">
-                                        <Dropdown
-                                            position={DropdownPosition.right}
-                                            onClick={onClick}
-                                            onSelect={onSelect}
-                                            toggle={<KebabToggle onToggle={onToggle} id="toggle-id-1" />}
-                                            isOpen={open && active === 'toggle-id-1'}
-                                            isPlain
-                                            dropdownItems={dropdownItems}
-                                            id="notification-1"
-                                        />
-                                    </NotificationDrawerListItemHeader>
-                                    <NotificationDrawerListItemBody timestamp={notification.timestamp}>
-                                        {notification.description || 'Description'}
-                                    </NotificationDrawerListItemBody>
-                                </NotificationDrawerListItem>
+                    <NotificationDrawerBody className="ins-c-notification-drawer__body">
+                        <NotificationDrawerGroupList>
+                            {Object.values(notificationGroups).map((item, key) => (
+                                <NotificationDrawerGroup
+                                    key={item?.groupName || key}
+                                    title={item?.title}
+                                    isExpanded={openedGroups.includes(item?.groupName || key)}
+                                    count={item?.items?.filter(({ isRead }) => !isRead)?.length || 0}
+                                    onExpand={(_e, value) => onGroupToggle(value, item?.groupName || key)}
+                                >
+                                    <NotificationDrawerList isHidden={!openedGroups.includes(item?.groupName || key)}>
+                                        {(item?.items || []).map((notification, notifiationKey) => (
+                                            <NotificationDrawerListItem
+                                                onClick={() => dispatch(markAsread(
+                                                    item?.groupName || key,
+                                                    notifiationKey
+                                                ))}
+                                                key={ notifiationKey }
+                                                variant={ notification?.type || 'info' }
+                                                isRead={ notification?.isRead || false }
+                                            >
+                                                { notification.header && (
+                                                    <NotificationDrawerListItemHeader
+                                                        variant={ notification?.type || 'info' }
+                                                        title={ notification.header }
+                                                        srTitle={ `${notification?.type || 'info'} notification:` }
+                                                    >
+                                                        <Button
+                                                            variant="link"
+                                                            isInline
+                                                            onClick={() => dispatch(deleteNotification(
+                                                                item?.groupName || key,
+                                                                notifiationKey
+                                                            ))}
+                                                        ><TimesIcon /></Button>
+                                                    </NotificationDrawerListItemHeader>
+                                                ) }
+                                                { notification.body && React.isValidElement(notification.body) && (
+                                                    <NotificationDrawerListItemBody
+                                                        timestamp={ notification.timestamp }
+                                                    >
+                                                        { notification.body }
+                                                </NotificationDrawerListItemBody>
+                                                ) }
+                                            </NotificationDrawerListItem>
+                                        ))}
+                                    </NotificationDrawerList>
+                                </NotificationDrawerGroup>
                             ))}
-                        </NotificationDrawerList>
+                        </NotificationDrawerGroupList>
                     </NotificationDrawerBody>
                 </NotificationDrawer>
             </DrawerHead>
@@ -98,7 +100,7 @@ const BasicNotificationDrawer = (props) => {
         <React.Fragment>
             <Button variant="plain" onClick={() => setShowDrawer(!showDrawer)}>
                 <MessagesIcon />
-                <Badge className="ins-c-notification-drawer__badge" key={1} isRead>{notifications.length}</Badge>
+                <Badge className="ins-c-notification-drawer__badge" key={1} isRead>{unreadCount}</Badge>
             </Button>
             <Drawer isExpanded={showDrawer}>
                 <DrawerContent panelContent={panelContent}>
@@ -108,11 +110,5 @@ const BasicNotificationDrawer = (props) => {
         </React.Fragment>
     );
 }
-
-NotificationDrawer.propTypes = {
-    notifications: PropTypes.array,
-    open: PropTypes.bool,
-    active: PropTypes.string
-};
 
 export default BasicNotificationDrawer;

@@ -9,7 +9,11 @@ import {
     clearActive,
     navUpdateReducer,
     onPageAction,
-    onPageObjectId
+    onPageObjectId,
+    onAddNotification,
+    onMarkAsReadNotification,
+    onLoadStoredNotifications,
+    onDeleteNotification
 } from './reducers';
 import {
     CLICK_ACTION,
@@ -20,7 +24,11 @@ import {
     CLEAR_ACTIVE,
     CHROME_NAV_UPDATE,
     CHROME_PAGE_ACTION,
-    CHROME_PAGE_OBJECT
+    CHROME_PAGE_OBJECT,
+    ADD_NEW_NOTIFICATION,
+    MARK_AS_READ_NOTIFICATION,
+    POPULATE_NOTIFICATIONS,
+    REMOVE_NOTIFICATION
 } from './action-types';
 
 const reducers = {
@@ -32,7 +40,11 @@ const reducers = {
     [USER_LOGIN]: loginReducer,
     [CHROME_NAV_UPDATE]: navUpdateReducer,
     [CHROME_PAGE_ACTION]: onPageAction,
-    [CHROME_PAGE_OBJECT]: onPageObjectId
+    [CHROME_PAGE_OBJECT]: onPageObjectId,
+    [ADD_NEW_NOTIFICATION]: onAddNotification,
+    [MARK_AS_READ_NOTIFICATION]: onMarkAsReadNotification,
+    [POPULATE_NOTIFICATIONS]: onLoadStoredNotifications,
+    [REMOVE_NOTIFICATION]: onDeleteNotification
 };
 
 export default function() {

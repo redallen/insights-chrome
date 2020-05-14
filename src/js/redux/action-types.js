@@ -11,3 +11,8 @@ export const CHROME_NAV_UPDATE = '@@chrome/app-nav-update';
 
 export const CHROME_PAGE_ACTION = '@@chrome/app-page-action';
 export const CHROME_PAGE_OBJECT = '@@chrome/app-object-id';
+
+export const ADD_NEW_NOTIFICATION = '@@chrome/new-notification';
+export const MARK_AS_READ_NOTIFICATION = '@@chrome/mark-as-read-notification';
+export const POPULATE_NOTIFICATIONS = '@@chrome/populate-notifications';
+export const REMOVE_NOTIFICATION = '@@chrome/remove-notification';
