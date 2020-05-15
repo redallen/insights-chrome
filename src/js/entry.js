@@ -211,9 +211,8 @@ function loadChrome(user) {
                         header: 'Inventory item was updated',
                         groupName: 'inventory',
                         groupTitle: 'Inventory notifications',
-                        body: <div>
-                            System <a href={`./insights/inventory/${host?.id}`}>{host?.display_name}</a> was updated!
-                        </div>
+                        body: `System ${host?.display_name} was updated!`,
+                        actionUrl: `./insights/inventory/${host?.id}`
                     });
                 });
             }

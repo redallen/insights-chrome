@@ -2,11 +2,11 @@
 import React, { useState, Fragment } from 'react';
 import { NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, NotificationDrawerList,
     NotificationDrawerListItem, NotificationDrawerListItemBody, NotificationDrawerListItemHeader,
-    Button, NotificationDrawerGroupList, NotificationDrawerGroup,
+    NotificationDrawerGroupList, NotificationDrawerGroup,
     DrawerPanelContent, DrawerHead } from '@patternfly/react-core';
-import { TimesIcon } from '@patternfly/react-icons';
 import { useSelector, useDispatch } from 'react-redux'
-import { markAsread, deleteNotification } from '../../redux/actions';
+import { markAsRead, deleteNotification } from '../../redux/actions';
+import NotificationDropdown from './NotificationDropdown';
 import './NotificationDrawer.scss';
 
 const calculateReadUnreadCount = (notificationsGroup) => notificationsGroup.reduce((acc, curr) => {
@@ -38,6 +38,18 @@ const BasicNotificationDrawer = () => {
             <DrawerHead>
                 <NotificationDrawer className="ins-c-notification-drawer">
                     <NotificationDrawerHeader count={ unreadCount !== 0 ? unreadCount : 'None' }>
+                    <NotificationDropdown
+                        actions={[
+                            {
+                                label: 'Mark all as read',
+                                onClick: () => dispatch(markAsRead(undefined, undefined, true))
+                            },
+                            {
+                                label: 'Remove all notifications',
+                                onClick: () => dispatch(deleteNotification(undefined, undefined, true))
+                            }
+                        ]}
+                    />
                     </NotificationDrawerHeader>
                     <NotificationDrawerBody className="ins-c-notification-drawer__body">
                         <NotificationDrawerGroupList>
@@ -52,7 +64,7 @@ const BasicNotificationDrawer = () => {
                                     <NotificationDrawerList isHidden={!openedGroups.includes(item?.groupName || key)}>
                                         {(item?.items || []).map((notification, notifiationKey) => (
                                             <NotificationDrawerListItem
-                                                onClick={() => dispatch(markAsread(
+                                                onClick={() => dispatch(markAsRead(
                                                     item?.groupName || key,
                                                     notifiationKey
                                                 ))}
@@ -66,17 +78,31 @@ const BasicNotificationDrawer = () => {
                                                         title={ notification.header }
                                                         srTitle={ `${notification?.type || 'info'} notification:` }
                                                     >
-                                                        <Button
-                                                            variant="link"
-                                                            isInline
-                                                            onClick={() => dispatch(deleteNotification(
-                                                                item?.groupName || key,
-                                                                notifiationKey
-                                                            ))}
-                                                        ><TimesIcon /></Button>
+                                                        <NotificationDropdown
+                                                            actions={[
+                                                                {
+                                                                    label: 'Delete',
+                                                                    onClick: () => dispatch(deleteNotification(
+                                                                        item?.groupName || key,
+                                                                        notifiationKey
+                                                                    ))
+                                                                },
+                                                                {
+                                                                    label: 'Mark as read',
+                                                                    onClick: () => dispatch(markAsRead(
+                                                                        item?.groupName || key,
+                                                                        notifiationKey
+                                                                    ))
+                                                                },
+                                                                ...item?.actionUrl ? [{
+                                                                    label: 'Action',
+                                                                    onClick: () => location.href = item.actionUrl
+                                                                }] : []
+                                                            ]}
+                                                        />
                                                     </NotificationDrawerListItemHeader>
                                                 ) }
-                                                { notification.body && React.isValidElement(notification.body) && (
+                                                { notification.body && (
                                                     <NotificationDrawerListItemBody
                                                         timestamp={ notification.timestamp }
                                                     >

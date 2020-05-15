@@ -97,10 +97,10 @@ export function addNotification({
     };
 }
 
-export function markAsread(groupName, notificationIndex) {
+export function markAsRead(groupName, notificationIndex, isAll = false) {
     return {
         type: actionTypes.MARK_AS_READ_NOTIFICATION,
-        payload: { groupName, notificationIndex }
+        payload: { groupName, notificationIndex, isAll }
     };
 }
 
@@ -112,10 +112,10 @@ export function loadStoredNotification(prefix) {
     };
 }
 
-export function deleteNotification(groupName, notificationIndex) {
+export function deleteNotification(groupName, notificationIndex, isAll = false) {
     return {
         type: actionTypes.REMOVE_NOTIFICATION,
-        payload: { groupName, notificationIndex }
+        payload: { groupName, notificationIndex, isAll }
     };
 }
 

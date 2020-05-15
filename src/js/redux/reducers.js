@@ -133,17 +133,36 @@ export function onAddNotification(state, { payload: { notificationGroup, ...payl
     };
 }
 
-export function onMarkAsReadNotification(state, { payload: { groupName, notificationIndex } }) {
-    const activeGroup = state?.notifications?.groups?.[groupName];
-    activeGroup.items[notificationIndex].isRead = true;
+export function onMarkAsReadNotification(state, { payload: { groupName, notificationIndex, isAll } }) {
+    let newNotifications;
 
-    const newNotifications = {
-        ...state?.notifications,
-        groups: {
-            ...state?.notifications?.groups,
-            [groupName]: activeGroup
+    if (isAll) {
+        newNotifications = {
+            ...state?.notifications,
+            groups: Object.entries(state?.notifications?.groups || {}).reduce((acc, [key, group]) => ({
+                ...acc,
+                [key]: {
+                    ...group,
+                    items: group?.items?.map(notification => ({ ...notification, isRead: true }))
+                }
+            }), {})
+        };
+    } else {
+        const activeGroup = state?.notifications?.groups?.[groupName];
+        if (!activeGroup.items[notificationIndex]) {
+            return state;
         }
-    };
+
+        activeGroup.items[notificationIndex].isRead = true;
+
+        newNotifications = {
+            ...state?.notifications,
+            groups: {
+                ...state?.notifications?.groups,
+                [groupName]: activeGroup
+            }
+        };
+    }
 
     localStorage.setItem(`${state?.notifications?.prefix}-chrome-notifications`, JSON.stringify(newNotifications));
 
@@ -153,17 +172,26 @@ export function onMarkAsReadNotification(state, { payload: { groupName, notifica
     };
 }
 
-export function onDeleteNotification(state, { payload: { groupName, notificationIndex } }) {
-    const activeGroup = state?.notifications?.groups?.[groupName];
-    activeGroup.items.splice(notificationIndex, 1);
+export function onDeleteNotification(state, { payload: { groupName, notificationIndex, isAll } }) {
+    let newNotifications;
 
-    const newNotifications = {
-        ...state?.notifications,
-        groups: {
-            ...state?.notifications?.groups,
-            [groupName]: activeGroup
-        }
-    };
+    if (isAll) {
+        newNotifications = {
+            ...state?.notifications,
+            groups: {}
+        };
+    } else {
+        const activeGroup = state?.notifications?.groups?.[groupName];
+
+        activeGroup.items.splice(notificationIndex, 1);
+        newNotifications = {
+            ...state?.notifications,
+            groups: {
+                ...state?.notifications?.groups,
+                [groupName]: activeGroup
+            }
+        };
+    }
 
     localStorage.setItem(`${state?.notifications?.prefix}-chrome-notifications`, JSON.stringify(newNotifications));
 
