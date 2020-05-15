@@ -9,6 +9,6 @@
     vertical-align: super;
 }
 
-.pf-c-drawer__panel {
-    right: 1rem;
+.ins-c-notification-drawer {
+    right: var(--pf-global--gutter--md);
 }

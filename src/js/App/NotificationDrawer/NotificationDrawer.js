@@ -34,7 +34,7 @@ const BasicNotificationDrawer = () => {
     const { unreadCount } = calculateReadUnreadCount(Object.values(notificationGroups));
    
     return (
-        <DrawerPanelContent>
+        <DrawerPanelContent className="ins-c-notification-drawer">
             <DrawerHead>
                 <NotificationDrawer className="ins-c-notification-drawer">
                     <NotificationDrawerHeader count={ unreadCount !== 0 ? unreadCount : 'None' }>
