@@ -2,9 +2,9 @@
 import React, { useState, Fragment } from 'react';
 import { NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, NotificationDrawerList,
     NotificationDrawerListItem, NotificationDrawerListItemBody, NotificationDrawerListItemHeader,
-    Button, Badge, NotificationDrawerGroupList, NotificationDrawerGroup,
-    Drawer, DrawerPanelContent, DrawerContent, DrawerContentBody, DrawerHead } from '@patternfly/react-core';
-import { MessagesIcon, TimesIcon } from '@patternfly/react-icons';
+    Button, NotificationDrawerGroupList, NotificationDrawerGroup,
+    DrawerPanelContent, DrawerHead } from '@patternfly/react-core';
+import { TimesIcon } from '@patternfly/react-icons';
 import { useSelector, useDispatch } from 'react-redux'
 import { markAsread, deleteNotification } from '../../redux/actions';
 import './NotificationDrawer.scss';
@@ -20,10 +20,9 @@ const calculateReadUnreadCount = (notificationsGroup) => notificationsGroup.redu
 const BasicNotificationDrawer = () => {
     const dispatch = useDispatch();
     const [openedGroups, setOpenedGroups] = useState([]);
-    const [showDrawer, setShowDrawer] = useState(false);
 
     const notificationGroups = useSelector(({ chrome: { notifications } }) => notifications?.groups || {});
-    
+
     const onGroupToggle = (isOpen, groupName) => {
         setOpenedGroups(
             isOpen ?
@@ -33,8 +32,8 @@ const BasicNotificationDrawer = () => {
     }
 
     const { unreadCount } = calculateReadUnreadCount(Object.values(notificationGroups));
-
-    const panelContent = (
+   
+    return (
         <DrawerPanelContent>
             <DrawerHead>
                 <NotificationDrawer className="ins-c-notification-drawer">
@@ -43,7 +42,7 @@ const BasicNotificationDrawer = () => {
                     <NotificationDrawerBody className="ins-c-notification-drawer__body">
                         <NotificationDrawerGroupList>
                             {Object.values(notificationGroups).map((item, key) => (
-                                <NotificationDrawerGroup
+                                item?.items?.length !== 0 ? <NotificationDrawerGroup
                                     key={item?.groupName || key}
                                     title={item?.title}
                                     isExpanded={openedGroups.includes(item?.groupName || key)}
@@ -87,27 +86,13 @@ const BasicNotificationDrawer = () => {
                                             </NotificationDrawerListItem>
                                         ))}
                                     </NotificationDrawerList>
-                                </NotificationDrawerGroup>
+                                </NotificationDrawerGroup> : <Fragment />
                             ))}
                         </NotificationDrawerGroupList>
                     </NotificationDrawerBody>
                 </NotificationDrawer>
             </DrawerHead>
-        </DrawerPanelContent>);
-
-   
-    return (
-        <React.Fragment>
-            <Button variant="plain" onClick={() => setShowDrawer(!showDrawer)}>
-                <MessagesIcon />
-                <Badge className="ins-c-notification-drawer__badge" key={1} isRead>{unreadCount}</Badge>
-            </Button>
-            <Drawer isExpanded={showDrawer}>
-                <DrawerContent panelContent={panelContent}>
-                    <DrawerContentBody/>
-                </DrawerContent>
-            </Drawer>
-        </React.Fragment>
+        </DrawerPanelContent>
     );
 }
 

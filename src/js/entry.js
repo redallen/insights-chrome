@@ -249,7 +249,7 @@ function loadChrome(user) {
 
 export function rootApp() {
     const { store } = spinUpStore();
-    const pageRoot = document.querySelector('.pf-c-page__drawer');
+    const pageRoot = document.querySelector('.pf-c-drawer');
     if (pageRoot) {
         render(
             <Provider store={store}>

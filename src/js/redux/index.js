@@ -13,7 +13,8 @@ import {
     onAddNotification,
     onMarkAsReadNotification,
     onLoadStoredNotifications,
-    onDeleteNotification
+    onDeleteNotification,
+    onToggleDrawer
 } from './reducers';
 import {
     CLICK_ACTION,
@@ -28,7 +29,8 @@ import {
     ADD_NEW_NOTIFICATION,
     MARK_AS_READ_NOTIFICATION,
     POPULATE_NOTIFICATIONS,
-    REMOVE_NOTIFICATION
+    REMOVE_NOTIFICATION,
+    TOGGLE_DRAWER
 } from './action-types';
 
 const reducers = {
@@ -44,7 +46,8 @@ const reducers = {
     [ADD_NEW_NOTIFICATION]: onAddNotification,
     [MARK_AS_READ_NOTIFICATION]: onMarkAsReadNotification,
     [POPULATE_NOTIFICATIONS]: onLoadStoredNotifications,
-    [REMOVE_NOTIFICATION]: onDeleteNotification
+    [REMOVE_NOTIFICATION]: onDeleteNotification,
+    [TOGGLE_DRAWER]: onToggleDrawer
 };
 
 export default function() {

@@ -198,3 +198,18 @@ export function onLoadStoredNotifications(state, { payload, meta }) {
         }
     };
 }
+
+export function onToggleDrawer(state) {
+    const drawerContainer = document.querySelector('.pf-c-drawer');
+
+    const drawerIsOpen = !state.drawerIsOpen;
+    if (drawerContainer) {
+        drawerContainer.classList.remove('pf-m-expanded');
+        drawerIsOpen && drawerContainer.classList.add('pf-m-expanded');
+    }
+
+    return {
+        ...state,
+        drawerIsOpen
+    };
+}

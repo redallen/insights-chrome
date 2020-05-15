@@ -118,3 +118,9 @@ export function deleteNotification(groupName, notificationIndex) {
         payload: { groupName, notificationIndex }
     };
 }
+
+export function toggleDrawer() {
+    return {
+        type: actionTypes.TOGGLE_DRAWER
+    };
+}

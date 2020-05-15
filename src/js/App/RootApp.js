@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import NotificationDrawer from './NotificationDrawer/NotificationDrawer';
 
 const RootApp = ({
     activeApp,
@@ -10,7 +11,7 @@ const RootApp = ({
     pageObjectId
 }) => {
     return (
-        <Fragment>
+        <div className="pf-c-drawer__main">
             <div
                 className="pf-c-drawer__content"
                 data-ouia-page-type={activeApp || appId}
@@ -42,10 +43,8 @@ const RootApp = ({
                 </main>
                 <main className="pf-c-page__main" id="no-access"></main>
             </div>
-            <aside className="pf-c-drawer__panel">
-                <div className="pf-c-drawer__panel-body" />
-            </aside>
-        </Fragment>
+            <NotificationDrawer />
+        </div>
     );
 };
 

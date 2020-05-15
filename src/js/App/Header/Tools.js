@@ -8,7 +8,7 @@ import UserToggle from './UserToggle';
 import UserIcon from './UserIcon';
 import ToolbarToggle from './ToolbarToggle';
 import InsightsAbout from './InsightsAbout';
-import BasicNotificationDrawer from '../NotificationDrawer/NotificationDrawer';
+import NotificationButton from '../NotificationDrawer/NotificationButton';
 
 import PropTypes from 'prop-types';
 
@@ -115,7 +115,7 @@ class Tools extends Component {
                                 </ToolbarItem>
                         ))}
                         <ToolbarItem>
-                            <BasicNotificationDrawer />
+                            <NotificationButton />
                         </ToolbarItem>
                     </ToolbarGroup>
                     <ToolbarGroup>
