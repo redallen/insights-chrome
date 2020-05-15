@@ -17,6 +17,7 @@ const NotificationDropdown = ({ actions }) => {
                     key={ item.value || key }
                     component="button"
                     onClick={ item.onClick }
+                    {...item.props}
                 >
                     {item.label}
                 </DropdownItem>

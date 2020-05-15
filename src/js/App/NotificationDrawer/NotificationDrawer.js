@@ -7,15 +7,8 @@ import { NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, N
 import { useSelector, useDispatch } from 'react-redux'
 import { markAsRead, deleteNotification } from '../../redux/actions';
 import NotificationDropdown from './NotificationDropdown';
+import { calculateReadUnreadCount } from './helpers';
 import './NotificationDrawer.scss';
-
-const calculateReadUnreadCount = (notificationsGroup) => notificationsGroup.reduce((acc, curr) => {
-    const unreadNotifications = curr?.items?.filter(({ isRead }) => !isRead) || [];
-    return {
-        unreadCount: acc.unreadCount + unreadNotifications.length,
-        readCount: acc.readCount + (curr.items.length - unreadNotifications.length)
-    }
-}, { unreadCount: 0, readCount: 0 })
 
 const BasicNotificationDrawer = () => {
     const dispatch = useDispatch();
@@ -31,7 +24,7 @@ const BasicNotificationDrawer = () => {
         );
     }
 
-    const { unreadCount } = calculateReadUnreadCount(Object.values(notificationGroups));
+    const { unreadCount, readCount } = calculateReadUnreadCount(Object.values(notificationGroups));
    
     return (
         <DrawerPanelContent className="ins-c-notification-drawer">
@@ -42,11 +35,17 @@ const BasicNotificationDrawer = () => {
                         actions={[
                             {
                                 label: 'Mark all as read',
-                                onClick: () => dispatch(markAsRead(undefined, undefined, true))
+                                onClick: () => dispatch(markAsRead(undefined, undefined, true)),
+                                props: {
+                                    isDisabled: unreadCount === 0
+                                }
                             },
                             {
                                 label: 'Remove all notifications',
-                                onClick: () => dispatch(deleteNotification(undefined, undefined, true))
+                                onClick: () => dispatch(deleteNotification(undefined, undefined, true)),
+                                props: {
+                                    isDisabled: (unreadCount + readCount) === 0
+                                }
                             }
                         ]}
                     />
