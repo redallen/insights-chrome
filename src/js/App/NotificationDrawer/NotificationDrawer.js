@@ -2,10 +2,10 @@
 import React, { useState, Fragment } from 'react';
 import { NotificationDrawer, NotificationDrawerBody, NotificationDrawerHeader, NotificationDrawerList,
     NotificationDrawerListItem, NotificationDrawerListItemBody, NotificationDrawerListItemHeader,
-    NotificationDrawerGroupList, NotificationDrawerGroup,
+    NotificationDrawerGroupList, NotificationDrawerGroup, DrawerActions, DrawerCloseButton,
     DrawerPanelContent, DrawerHead } from '@patternfly/react-core';
 import { useSelector, useDispatch } from 'react-redux'
-import { markAsRead, deleteNotification } from '../../redux/actions';
+import { markAsRead, deleteNotification, toggleDrawer } from '../../redux/actions';
 import NotificationDropdown from './NotificationDropdown';
 import { calculateReadUnreadCount } from './helpers';
 import './NotificationDrawer.scss';
@@ -29,6 +29,9 @@ const BasicNotificationDrawer = () => {
     return (
         <DrawerPanelContent className="ins-c-notification-drawer">
             <DrawerHead>
+                <DrawerActions>
+                    <DrawerCloseButton onClick={() => dispatch(toggleDrawer())}/>
+                </DrawerActions>
                 <NotificationDrawer className="ins-c-notification-drawer">
                     <NotificationDrawerHeader count={ unreadCount !== 0 ? unreadCount : 'None' }>
                     <NotificationDropdown
