@@ -102,7 +102,7 @@ export const init = (options) => {
 
   const isBeta = window.location.pathname.split('/')[1] === 'beta' ? '/beta' : '';
 
-  options.silentCheckSsoRedirectUri = `https://${window.location.host}${isBeta}/silent-check-sso.html`;
+  options.silentCheckSsoRedirectUri = `${window.location.origin}${isBeta}/silent-check-sso.html`;
 
   if (window.localStorage && window.localStorage.getItem('chrome:jwt:shortSession') === 'true') {
     options.realm = 'short-session';
@@ -325,7 +325,10 @@ function getCookieExpires(exp) {
 function setCookie(token) {
   log('Setting the cs_jwt cookie');
   if (token && token.length > 10) {
-    setCookieWrapper(`${priv.cookie.cookieName}=${token};` + `path=/;` + `secure=true;` + `expires=${getCookieExpires(decodeToken(token).exp)}`);
+    const cookieString = `${priv.cookie.cookieName}=${token};`
+      + `path=/;`
+      + `expires=${getCookieExpires(decodeToken(token).exp)}`;
+    setCookieWrapper(cookieString);
   }
 }
 

@@ -11,7 +11,7 @@ export default (env) => {
     return ssoEnv?.[1].sso;
   } else {
     log('SSO url: not found, defaulting to qa');
-    log('Current env: not found, defaultint to qa');
-    return 'https://sso.qa.redhat.com/auth';
+    log('Current env: not found, defaulting to qa');
+    return 'http://localhost:8180/auth';
   }
 };
