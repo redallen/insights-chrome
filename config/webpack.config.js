@@ -14,7 +14,7 @@ const commonConfig = ({
         filename: `chrome${noHash ? '' : '.[chunkhash]'}.js`,
         publicPath,
         chunkFilename: `[name]${noHash ? '' : '.[chunkhash]'}.js`,
-        jsonpFunction: 'wpJsonpChromeInstance'
+        //jsonpFunction: 'wpJsonpChromeInstance'
     },
     resolve: {
         alias: {
@@ -23,6 +23,11 @@ const commonConfig = ({
             reactRedux: path.resolve(__dirname, './react-redux-external.js'),
             'react-router-dom': path.resolve(__dirname, './react-router-dom-externals.js'),
             PFReactCore: path.resolve(__dirname, './patternfly-react-externals.js')
+        },
+        fallback: {
+          stream: require.resolve("stream-browserify"),
+          path: require.resolve("path-browserify"),
+          zlib: require.resolve("browserify-zlib")
         }
     },
     optimization: {
@@ -51,11 +56,6 @@ const commonConfig = ({
                     }
                 ]
             },
-            {
-                parser: {
-                    amd: false
-                }
-            }
         ]
     },
     plugins
